@@ -10,15 +10,15 @@ void gotoXY(int x, int y);
 void printprevious();
 int printStage_1();
 
-int main() {
-	int n = printMainTitle();
-	if (n != 0) {
-		return 0;
-	}
-	printprevious();
-	printStage_1();
-	return 0;
-}
+//int main() {
+//	int n = printMainTitle();
+//	if (n != 0) {
+//		return 0;
+//	}
+//	printprevious();
+//	printStage_1();
+//	return 0;
+//}
 
 int printMainTitle() {
 	int x = 32;
