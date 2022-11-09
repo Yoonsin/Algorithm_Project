@@ -4,23 +4,18 @@
 #include <conio.h>
 #include <stdlib.h>
 
-int printMainTitle();
+int printStage1_2();
 int getKey();
 void gotoXY(int x, int y);
-void printprevious();
-int printStage_1();
+void Stage1_2Side();
+int Stage_1();
 
 //int main() {
-//	int n = printMainTitle();
-//	if (n != 0) {
-//		return 0;
-//	}
-//	printprevious();
-//	printStage_1();
+//	printStage1_2();
 //	return 0;
 //}
 
-int printMainTitle() {
+int printStage1_2() {
 	int x = 32;
 	int y = 13;
 	//system("mode con cols=100 lines=25");
@@ -38,7 +33,7 @@ int printMainTitle() {
 	printf("  exit");
 	y = 13;
 
-	while (1) {
+	while (y >= 13) {
 		char n = getKey();
 		switch (n) {
 		case 72:
@@ -59,12 +54,18 @@ int printMainTitle() {
 			break;
 		case -1:
 			system("cls");
-			return y - 13;
+			y -= 13;
+			break;
 		default:
 			break;
 		}
-
 	}
+	if (y != 0) {
+		return 0;
+	}
+	Stage1_2Side();
+
+	return Stage_1();
 }
 
 void gotoXY(int x, int y) {
@@ -100,7 +101,7 @@ int getKey() {
 	return 0;
 }
 
-void printprevious() {
+void Stage1_2Side() {
 	gotoXY(0, 0);
 	printf("             @@.    \n");
 	printf("            @@@@    \n");
@@ -128,7 +129,7 @@ void printprevious() {
 	system("cls");
 }
 
-int printStage_1() {
+int Stage_1() {
 	gotoXY(0, 18);
 	printf("           -----------------------------------M A P-----------------------------------\n");
 	gotoXY(10, 20);
