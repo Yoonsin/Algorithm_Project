@@ -34,22 +34,22 @@ int max(int a, int b)
 void kanpsack()
 {
 	Stuff stuff[MAX_STUFF_NUM]; //5개의 물건 구조체 생성
-	for (int i = 0; i < MAX_STUFF_NUM) //물건, 가치 랜덤으로 넣기
+	for (int i = 0; i < MAX_STUFF_NUM; i++) //물건, 가치 랜덤으로 넣기
 	{
 		stuff[i].weight = i;
 		stuff[i].value = i; //문제. 랜덤으로 넣으면 다시 정렬해줘야 할텐데..
 	}
 
-	int arr[MAX_STUFF_NUM + 1][MAX_BAG_NUM+1]; // 용량 C일 때 담을 수 있는 물건의 최대가치 k[i,w]배열. 0도 고려해야 해서 인덱스에 +1 해주기  
+	int arr[MAX_STUFF_NUM + 1][MAX_BAG_NUM + 1]; // 용량 C일 때 담을 수 있는 물건의 최대가치 k[i,w]배열. 0도 고려해야 해서 인덱스에 +1 해주기  
 
 
-	for (inti = 0; i < MAX_STUFF_NUM + 1; i++)
+	for (int i = 0; i < MAX_STUFF_NUM + 1; i++)
 		arr[i][0] = 0;
-	for (int i = 0; i < MAX_BAG_NUM+1; i++) //맨 위 주석처럼 물건 0개, 용량 0일 때는 가치를 전부 0으로 초기화 해주기
+	for (int i = 0; i < MAX_BAG_NUM + 1; i++) //맨 위 주석처럼 물건 0개, 용량 0일 때는 가치를 전부 0으로 초기화 해주기
 		arr[0][i] = 0;
-	
 
-	
+
+
 	for (int i = 1; i < MAX_STUFF_NUM + 1; i++)
 	{
 		for (int j = 1; j < MAX_BAG_NUM + 1; j++)
@@ -66,12 +66,12 @@ void kanpsack()
 			}
 		}
 	}
-		
+
 
 	printf("최대 가치는 %d입니다.", arr[MAX_STUFF_NUM][MAX_BAG_NUM]);
 
-		
-	//더 해야하는 것.1. 무게랑 가치 '랜덤 생성'하고 '정렬' 2. 최대 가치에서 선택한 물건들이 무엇무엇인지 알려줄 것.
+
+
 
 }
 
