@@ -31,7 +31,7 @@ typedef struct SelStuff {
 	int sel[MAX_STUFF_NUM];
 }SelStuff;
 
-int max(int a, int b)
+int max_num(int a, int b)
 {
 	if (a > b) return a;
 	else if (a < b) return b;
@@ -76,7 +76,7 @@ void kanpsack()
 		for (int j = 1; j < MAX_BAG_NUM + 1; j++) {
 			if (j >= stuff[i - 1].weight) { //j가 물건 무게보다 크거나 같을 때만(배열 인덱스 음수로 접근할 경우 방지)
 
-				arr[i][j] = max(arr[i - 1][j], arr[i - 1][j - (stuff[i - 1].weight)] + stuff[i - 1].value); //stuff는 0부터 시작하고 i는 1부터 시작해서 stuff에 정확히 접근하려면 i-1로 해줘야함
+				arr[i][j] = max_num(arr[i - 1][j], arr[i - 1][j - (stuff[i - 1].weight)] + stuff[i - 1].value); //stuff는 0부터 시작하고 i는 1부터 시작해서 stuff에 정확히 접근하려면 i-1로 해줘야함
 				if (arr[i][j] == arr[i - 1][j - (stuff[i - 1].weight)] + stuff[i - 1].value) { //i개 물건까지 포함할 때
 
 					for (int k = 0; k < MAX_STUFF_NUM; k++) {
@@ -100,7 +100,7 @@ void kanpsack()
 	}
 
 	printf("배낭의 무게: %d\n", MAX_BAG_NUM);
-	for (int i = 0; i < MAX_STUFF_NUM; i++)
+	for (int i = 0; i < MAX_STUFF_NUM; i++) 
 	{
 		printf("물건 %d 의 가치: %d, 무게: %d\n", i + 1, stuff[i].value, stuff[i].weight);
 	}
