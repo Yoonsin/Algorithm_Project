@@ -3,21 +3,35 @@
 #include <Windows.h>
 #include <conio.h>
 #include <stdlib.h>
+#define INF 1000000		//무한대
 
 int printStage1_2();				// 타이틀 화면부터, 스테이지1까지 전부 출력할 함수. 
 int getKey();						// 타이틀에서 위/아래 키 입력 감지할 때 쓰는 함수
 void gotoXY(int x, int y);			// 커서 이동
-void Stage1_2Side();				// 중간에 이미지 화면 띄울 함수. 없어도 됨.
+void StageOneSide();				// 중간 이미지 그리기. Theif Serching for Paths
 int Stage_1();						// 스테이지 1 출력 함수
-void printMapNode(int x, int y, char c);			//맵 그리기. 노드
-void printEdge(int x1, int y1, int x2, int y2);		//맵 그리기. 간선
+void printMapNode(int x, int y, char c);							//맵 그리기. 노드
+void printMapEdge(int x1, int y1, int x2, int y2, int weight);		//맵 그리기. 간선
+void StageTwoSide();				// 중간 이미지 그리기. Theif Steals ...
 
+typedef struct _Node {	// 지도에 표시할 x, y 좌표와 간선 가중치값(weight), 그리고 이 노드 이름 (A, B 등) 을 포함한 구조체
+	int x;
+	int y;
+	int weight[5];
+	char name;
+}Node;
+
+						//////////////////////
+
+// 메인 함수 부분.
 //int main() {
 //	printStage1_2();
 //	return 0;
 //}
 
-int printStage1_2() {
+						//////////////////////
+
+int printStage1_2() { // 타이틀 출력 -> 중간 이미지 출력 -> 스테이지 1 출력해주는 함수. return 값은 stage1 의 점수.
 	int x = 32;
 	int y = 13;
 	//system("mode con cols=100 lines=25"); 화면 크기는 글쎄요
@@ -68,9 +82,17 @@ int printStage1_2() {
 	if (y != 0) {			// start메뉴의 y좌표값은 13. 스페이스/엔터 입력 시 y-13 값을 y에 저장하는데, 그 값이 0이 아니면 게임 나가기.
 		return 0;
 	}
-	Stage1_2Side();			// 그 아스키 아트 출력하는 함수
+	StageOneSide();			// Theif Searching for Paths.....
 
-	return Stage_1();
+	int playerScore = Stage_1();
+
+	gotoXY(35, 24);
+	printf("Press Any Key...");
+	_getch();
+
+	StageTwoSide();			//Theif Steals...
+
+	return playerScore;
 }
 
 void gotoXY(int x, int y) {
@@ -107,7 +129,7 @@ int getKey() {
 	return 0;
 }
 
-void Stage1_2Side() {
+void StageOneSide() {
 	gotoXY(0, 0);
 	printf("             @@.    \n");
 	printf("            @@@@    \n");
@@ -130,35 +152,96 @@ void Stage1_2Side() {
 	printf("          @@@       \n");
 	printf("          @@        ");
 	gotoXY(30, 8);
-	printf("Thief Steals");
+	printf("Thief Searching");
+	gotoXY(37, 9);
+	printf("for Paths");
 	Sleep(3000);
 	system("cls");
 }
 
-int Stage_1() {
+int Stage_1() {		//노드 5개. 맵 그리기 -> 유저 입력 받기 -> 가중치 합 구하고 점수 내기. return 값은 score 값.
 
-	printMapNode(0, 0, 'A');
-	printMapNode(70, 0, 'B');
-	printMapNode(0, 11, 'C');
-	printMapNode(35, 6, 'E');
-	printMapNode(70, 11, 'D');
 
-	printEdge(0, 0, 70, 0);
-	printEdge(0, 0, 0, 11);
-	printEdge(70, 0, 70, 11);
-	printEdge(0, 11, 70, 11);
+	// 가중치 일단 막 설정해뒀음.
+		//노드에서 노드로 이동할 때의 가중치는 오고 갈 때가 똑같다고 가정했음. (여행자 문제처럼)
+	Node a = { 0, 0, {0, 1, 2, INF, 3}, 'A' };
+	Node b = { 70, 0, { 1, 0, INF, 2, 3 }, 'B' };
+	Node c = { 0, 11, { 2, INF, 0, 1, 3 }, 'C' };
+	Node d = { 70,11, { INF, 2, 1, 0, 3 }, 'D' };
+	Node e = { 35, 6, { 3, 3, 3, 3, 0 }, 'E' };
 
-	//대각선 그릴 땐 언제나 왼쪽에서 오른쪽으로. x1 < x2
-	printEdge(0, 0, 35, 6);
-	printEdge(0, 11, 35, 6);
-	printEdge(35, 6, 70, 0);
-	printEdge(35, 6, 70, 11);
+	Node nodeList[5] = { a, b, c, d, e };
 
+	for (int i = 0; i < 5; i++) {
+		printMapNode(nodeList[i].x, nodeList[i].y, nodeList[i].name);
+		for (int j = 0; j < 5; j++) {
+			if (i == j) {
+				continue;
+			}
+			printMapEdge(nodeList[i].x, nodeList[i].y, nodeList[j].x, nodeList[j].y, nodeList[i].weight[j]);
+		}
+	}
 	gotoXY(0, 18);
 	printf("           -----------------------------------M A P-----------------------------------\n");
-	gotoXY(10, 20);
-	printf("Route: ");
-	return 0;
+
+	//유저 입력 받기
+	char playerInput[20];			//플레이어 입력 받아둘 곳
+	boolean isInputValid = FALSE;	// 입력이 옳은가?
+
+	do {
+		gotoXY(10, 21);
+		printf("example) ABCDE, abcde, dEcAb");
+		gotoXY(10, 20);
+		printf("Route:                                        ");
+		gotoXY(17, 20);
+		scanf("%s", playerInput);
+
+		if (strlen(playerInput) != 5) { // 길이가 5가 아니라면 다시 입력받기
+			continue;
+		}
+
+		isInputValid = TRUE;			//일단 TRUE로 설정.
+
+		for (int i = 0; i < 5; i++) {	// A~Z 값이 아니면 FALSE
+			if ( (playerInput[i] > 'z') || playerInput[i] < 'A' ) {
+				isInputValid = FALSE;
+				break;
+			}							
+			if (playerInput[i] >= 'a') {	// 소문자를 대문자로 변환.
+				playerInput[i] -= 32;
+			}
+			if (playerInput[i] > 'E') {	// 루트에 없는 알파벳 (T 등)을 입력했다면 다시 입력받기 위해 FALSE 설정
+				isInputValid = FALSE;
+				break;
+			}
+		}
+
+	} while (!(isInputValid));	
+
+	//플레이어가 입력한 루트의 길이(가중치의 합) 구하기
+	int playerWeight = 0;
+	for (int i = 0; i < 5 - 1; i++) {
+		playerWeight += nodeList[playerInput[i] - 'A'].weight[playerInput[i + 1] - 'A'];
+	}
+
+	// 이것이 당신의 가중치 합입니다..
+	gotoXY(10, 21);
+	printf("                                                  ");
+	gotoXY(10, 21);
+	if (playerWeight >= INF) {
+		printf("your Route Weight: Not Found");
+	}
+	else
+		printf("Your Route Weight: %d", playerWeight);
+
+	//다익스트라로 구한 최소 루트의 가중치랑 비교해서 스코어 매기기
+	printf("\n          ...");
+	//다익스트라로 구해진 최소 가중치합을 DjikScore 라고 하면..
+	int DjikWeight = 8;
+	int Stage1Score = 100 / (playerWeight - DjikWeight + 1); // 100점 만점 이라고 가정
+
+	printf("Score: %d", Stage1Score);;
+	return Stage1Score;
 }
 
 void printMapNode(int x, int y, char c) {
@@ -170,7 +253,14 @@ void printMapNode(int x, int y, char c) {
 	printf("└──┘");
 }
 
-void printEdge(int x1, int y1, int x2, int y2) { // x1 y1 은 출발하는 노드. y1 y2는 목적지 노드. 1에서 2까지 잇기
+void printMapEdge(int x1, int y1, int x2, int y2, int weight) { // x1 y1 은 출발하는 노드. y1 y2는 목적지 노드. 1에서 2까지 잇기
+
+	if (weight == INF || weight == 0) {
+		return;
+	}
+
+	int weightX = (x2 + x1) / 2 + 11;
+	int weightY = (y1 + y2) / 2 + 2;
 
 	if ((y1 == y2) && (x1 != x2)) { // 가로로 선 긋기
 		gotoXY(x1 + 11 + 5, y1 + 1);
@@ -178,6 +268,7 @@ void printEdge(int x1, int y1, int x2, int y2) { // x1 y1 은 출발하는 노드. y1 y
 			printf("─");
 			x1++;
 		}
+		weightY -= 1;
 	}
 	else if ((x1 == x2) && (y1 != y2)) { // 세로로 선 긋기
 		gotoXY(x1 + 11 + 2, y1 + 3);
@@ -186,8 +277,10 @@ void printEdge(int x1, int y1, int x2, int y2) { // x1 y1 은 출발하는 노드. y1 y
 			y1++;
 			gotoXY(x1 + 11 + 2, y1 + 3);
 		}
+		weightX += 1;
 	}
 	else if ((x1 < x2) && (y1 > y2)) { // 대각선 우상단으로 긋기
+
 		y2 += 2; // 목적지 노드의 하단이 목표라 y2값을 2만큼 아래로 함. y가 증가할 수록 밑으로 내려감.
 		int angle = 100 * (y1 - y2) / (x2 - x1);
 		int xRange = x2 - x1;
@@ -200,7 +293,7 @@ void printEdge(int x1, int y1, int x2, int y2) { // x1 y1 은 출발하는 노드. y1 y
 			while (yCount >= 200) {
 				printf("l");
 				gotoXY(x1, --y1);
-				yCount-= 100;
+				yCount -= 100;
 			}
 			if (yCount > 100) {
 				printf("/");
@@ -211,7 +304,7 @@ void printEdge(int x1, int y1, int x2, int y2) { // x1 y1 은 출발하는 노드. y1 y
 				printf("-");
 				gotoXY(++x1, y1);
 			}
-			
+
 		}
 		while (y1 != y2 - 2) {
 			if (y1 < y2) {
@@ -229,6 +322,7 @@ void printEdge(int x1, int y1, int x2, int y2) { // x1 y1 은 출발하는 노드. y1 y
 		int angle = 100 * (y2 - y1) / (x2 - x1);
 		int xRange = x2 - x1;
 		x1 += (11 + 4);
+
 		for (int i = 0, yCount = 0; i < xRange - 4; i++) {
 			gotoXY(x1, y1);
 
@@ -256,7 +350,45 @@ void printEdge(int x1, int y1, int x2, int y2) { // x1 y1 은 출발하는 노드. y1 y
 			printf("│");
 			gotoXY(x1, ++y1);
 		}
+		weightY -= 1;
 
 	}
-	
+	else
+		return;
+
+	// 가중치 출력하기
+	gotoXY(weightX, weightY);
+	printf("-%d-", weight);
+
+}
+
+void StageTwoSide() {
+	system("cls");
+	gotoXY(0, 0);
+
+	printf("            u$$$$$$$$$$(uW%             \n");
+	printf("            c$$$$$$$$$$$$v              \n");
+	printf("             M$$$$$$$$$$c              \n");
+	printf("             }$$$$$$$$}                \n");
+	printf("               8$$$$$t                \n");
+	printf("            _8$$$$$$$$$%1             Thief\n");
+	printf("          {$$$$$$$$$$$$$$$u               Steals\n");
+	printf("         @$$$$$$$$$$$$$$$$$$n         \n");
+	printf("       z$$$$$$$$$& '$$$$$$$$$$]        \n");
+	printf("      B$$$$$$$8!'    ' > % $$$$$c     \n");
+	printf("     $$$$$$$$$` _v .8- ^$$$$$$$$8     \n");
+	printf("    $$$$$$$$$$I `l .&$W%$$$$$$$$$&    \n");
+	printf("    W$$$$$$$$$$$*-,   .'v$$$$$$$$$$v    \n");
+	printf("    $$$$$$$$$$$:,B# .$j .$$$$$$$$$$$   \n");
+	printf("   $$$$$$$$$$$? ': .-^ :$$$$$$$$$$$]   \n");
+	printf("   $$$$$$$$$$$$8{:  ,~u$$$$$$$$$$$$~   \n");
+	printf("    u$$$$$$$$$$$$$B,>$$$$$$$$$$$$$$8   \n");
+	printf("    {$$$$$$$$$$$$$$$$$$$$$$$$$$$$u    \n");
+	printf("      +*$$$$$$$$$$$$$$$$$$$$$$B|      \n");
+	printf("         ^I?|xzW8B$$$@%Mcj)~         \n");
+
+	Sleep(3000);
+	system("cls");
+
+	return;
 }
