@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <stdlib.h>
 #define INF 1000000		//¹«ÇÑ´ë
+#define NUMBEROFNODES 7
 
 int printStage1_2();				// Å¸ÀÌÆ² È­¸éºÎÅÍ, ½ºÅ×ÀÌÁö1±îÁö ÀüºÎ Ãâ·ÂÇÒ ÇÔ¼ö. 
 int getKey();						// Å¸ÀÌÆ²¿¡¼­ À§/¾Æ·¡ Å° ÀÔ·Â °¨ÁöÇÒ ¶§ ¾²´Â ÇÔ¼ö
@@ -17,17 +18,17 @@ void StageTwoSide();				// Áß°£ ÀÌ¹ÌÁö ±×¸®±â. Theif Steals ...
 typedef struct _Node {	// Áöµµ¿¡ Ç¥½ÃÇÒ x, y ÁÂÇ¥¿Í °£¼± °¡ÁßÄ¡°ª(weight), ±×¸®°í ÀÌ ³ëµå ÀÌ¸§ (A, B µî) À» Æ÷ÇÔÇÑ ±¸Á¶Ã¼
 	int x;
 	int y;
-	int weight[5];
+	int weight[NUMBEROFNODES];
 	char name;
 }Node;
 
 						//////////////////////
 
 // ¸ÞÀÎ ÇÔ¼ö ºÎºÐ.
-//int main() {
-//	printStage1_2();
-//	return 0;
-//}
+int main() {
+	printStage1_2();
+	return 0;
+}
 
 						//////////////////////
 
@@ -164,24 +165,26 @@ int Stage_1() {		//³ëµå 5°³. ¸Ê ±×¸®±â -> À¯Àú ÀÔ·Â ¹Þ±â -> °¡ÁßÄ¡ ÇÕ ±¸ÇÏ°í Á¡¼
 
 	// °¡ÁßÄ¡ ÀÏ´Ü ¸· ¼³Á¤ÇØµ×À½.
 		//³ëµå¿¡¼­ ³ëµå·Î ÀÌµ¿ÇÒ ¶§ÀÇ °¡ÁßÄ¡´Â ¿À°í °¥ ¶§°¡ ¶È°°´Ù°í °¡Á¤ÇßÀ½. (¿©ÇàÀÚ ¹®Á¦Ã³·³)
-	Node a = { 0, 0, {0, 1, 2, INF, 3}, 'A' };
-	Node b = { 70, 0, { 1, 0, INF, 2, 3 }, 'B' };
-	Node c = { 0, 11, { 2, INF, 0, 1, 3 }, 'C' };
-	Node d = { 70,11, { INF, 2, 1, 0, 3 }, 'D' };
-	Node e = { 35, 6, { 3, 3, 3, 3, 0 }, 'E' };
+	Node a = { 0, 0, {0, 5, 1, 2, INF, INF, INF}, 'A' };
+	Node b = { 70, 0, {5, 0, INF, 2, 1, INF, INF}, 'B' };
+	Node c = { 0, 10, { 1, INF, 0, 1, INF, 1, INF}, 'C' };
+	Node d = { 35,10, {2, 2, 1, 0, 1, 2, 2}, 'D' };
+	Node e = { 70, 10, {INF,1, INF, 1, 0, INF, 1}, 'E' };
+	Node f = { 0, 20, {INF, INF, 1, 2, INF, 0, 5}, 'F'};
+	Node g = { 70, 20, {INF, INF, INF, 2, 1, 5, 0}, 'G'};
 
-	Node nodeList[5] = { a, b, c, d, e };
+	Node nodeList[NUMBEROFNODES] = { a, b, c, d, e , f, g};
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < NUMBEROFNODES; i++) {
 		printMapNode(nodeList[i].x, nodeList[i].y, nodeList[i].name);
-		for (int j = 0; j < 5; j++) {
+		for (int j = 0; j < NUMBEROFNODES; j++) {
 			if (i == j) {
 				continue;
 			}
 			printMapEdge(nodeList[i].x, nodeList[i].y, nodeList[j].x, nodeList[j].y, nodeList[i].weight[j]);
 		}
 	}
-	gotoXY(0, 18);
+	gotoXY(0, 24);
 	printf("           -----------------------------------M A P-----------------------------------\n");
 
 	//À¯Àú ÀÔ·Â ¹Þ±â
@@ -189,20 +192,20 @@ int Stage_1() {		//³ëµå 5°³. ¸Ê ±×¸®±â -> À¯Àú ÀÔ·Â ¹Þ±â -> °¡ÁßÄ¡ ÇÕ ±¸ÇÏ°í Á¡¼
 	boolean isInputValid = FALSE;	// ÀÔ·ÂÀÌ ¿ÇÀº°¡?
 
 	do {
-		gotoXY(10, 21);
-		printf("example) ABCDE, abcde, dEcAb");
-		gotoXY(10, 20);
+		gotoXY(10, 27);
+		printf("example) ABCDE, ack, LwQa");
+		gotoXY(10, 26);
 		printf("Route:                                        ");
-		gotoXY(17, 20);
+		gotoXY(17, 26);
 		scanf("%s", playerInput);
 
-		if (strlen(playerInput) != 5) { // ±æÀÌ°¡ 5°¡ ¾Æ´Ï¶ó¸é ´Ù½Ã ÀÔ·Â¹Þ±â
+		if (strlen(playerInput) != NUMBEROFNODES) { // ±æÀÌ°¡ NUMBEROFNODES°¡ ¾Æ´Ï¶ó¸é ´Ù½Ã ÀÔ·Â¹Þ±â
 			continue;
 		}
 
 		isInputValid = TRUE;			//ÀÏ´Ü TRUE·Î ¼³Á¤.
 
-		for (int i = 0; i < 5; i++) {	// A~Z °ªÀÌ ¾Æ´Ï¸é FALSE
+		for (int i = 0; i < NUMBEROFNODES; i++) {	// A~Z °ªÀÌ ¾Æ´Ï¸é FALSE
 			if ( (playerInput[i] > 'z') || playerInput[i] < 'A' ) {
 				isInputValid = FALSE;
 				break;
@@ -210,7 +213,7 @@ int Stage_1() {		//³ëµå 5°³. ¸Ê ±×¸®±â -> À¯Àú ÀÔ·Â ¹Þ±â -> °¡ÁßÄ¡ ÇÕ ±¸ÇÏ°í Á¡¼
 			if (playerInput[i] >= 'a') {	// ¼Ò¹®ÀÚ¸¦ ´ë¹®ÀÚ·Î º¯È¯.
 				playerInput[i] -= 32;
 			}
-			if (playerInput[i] > 'E') {	// ·çÆ®¿¡ ¾ø´Â ¾ËÆÄºª (T µî)À» ÀÔ·ÂÇß´Ù¸é ´Ù½Ã ÀÔ·Â¹Þ±â À§ÇØ FALSE ¼³Á¤
+			if (playerInput[i] > 'A' + NUMBEROFNODES - 1) {	// ·çÆ®¿¡ ¾ø´Â ¾ËÆÄºª (T µî)À» ÀÔ·ÂÇß´Ù¸é ´Ù½Ã ÀÔ·Â¹Þ±â À§ÇØ FALSE ¼³Á¤
 				isInputValid = FALSE;
 				break;
 			}
@@ -220,14 +223,14 @@ int Stage_1() {		//³ëµå 5°³. ¸Ê ±×¸®±â -> À¯Àú ÀÔ·Â ¹Þ±â -> °¡ÁßÄ¡ ÇÕ ±¸ÇÏ°í Á¡¼
 
 	//ÇÃ·¹ÀÌ¾î°¡ ÀÔ·ÂÇÑ ·çÆ®ÀÇ ±æÀÌ(°¡ÁßÄ¡ÀÇ ÇÕ) ±¸ÇÏ±â
 	int playerWeight = 0;
-	for (int i = 0; i < 5 - 1; i++) {
+	for (int i = 0; i < NUMBEROFNODES - 1; i++) {
 		playerWeight += nodeList[playerInput[i] - 'A'].weight[playerInput[i + 1] - 'A'];
 	}
 
 	// ÀÌ°ÍÀÌ ´ç½ÅÀÇ °¡ÁßÄ¡ ÇÕÀÔ´Ï´Ù..
-	gotoXY(10, 21);
+	gotoXY(10, 27);
 	printf("                                                  ");
-	gotoXY(10, 21);
+	gotoXY(10, 27);
 	if (playerWeight >= INF) {
 		printf("your Route Weight: Not Found");
 	}
