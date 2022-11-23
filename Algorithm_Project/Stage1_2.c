@@ -87,7 +87,7 @@ int printStage1_2() { // 타이틀 출력 -> 중간 이미지 출력 -> 스테이지 1 출력해주�
 
 	int playerScore = Stage_1();
 
-	gotoXY(35, 24);
+	gotoXY(35, 29);
 	printf("Press Any Key...");
 	_getch();
 
